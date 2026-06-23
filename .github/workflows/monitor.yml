@@ -1,0 +1,23 @@
+name: Uptime Monitor
+
+on:
+  schedule:
+    # Runs once per hour at :00
+    - cron: "0 * * * *"
+  workflow_dispatch: # Lets you trigger manually for testing
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Check site
+        env:
+          SITE_URL: ${{ secrets.SITE_URL }}
+          ALERT_EMAIL: ${{ secrets.ALERT_EMAIL }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+        run: python monitor.py
