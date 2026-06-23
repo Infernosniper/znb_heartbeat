@@ -8,6 +8,7 @@ from email.mime.text import MIMEText
 from datetime import datetime, timezone
 
 SITE_URL = os.environ["SITE_URL"]
+SITE_NAME = os.environ["SITE_NAME"]
 ALERT_EMAIL = os.environ["ALERT_EMAIL"]
 SMTP_USER = os.environ["SMTP_USER"]
 SMTP_PASS = os.environ["SMTP_PASS"]
@@ -40,8 +41,8 @@ def check_site():
 
 def send_alert(error_detail):
     now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
-    subject = f"ALERT: {SITE_URL} is DOWN"
-    body = f"{SITE_URL} is unreachable.\n\nTime: {now}\nError: {error_detail}"
+    subject = f"ALERT: {SITE_NAME} is DOWN"
+    body = f"Time: {now}."
 
     msg = MIMEText(body)
     msg["Subject"] = subject
@@ -60,8 +61,8 @@ if __name__ == "__main__":
     ok, detail = check_site()
     now = datetime.now(timezone.utc).strftime("%H:%M UTC")
     if ok:
-        print(f"[{now}] {SITE_URL} is UP ({detail})")
+        print(f"[{now}] {SITE_NAME} ({SITE_URL}) is UP ({detail})")
     else:
-        print(f"[{now}] {SITE_URL} is DOWN ({detail}) — sending alert")
+        print(f"[{now}] {SITE_NAME} ({SITE_URL}) is DOWN ({detail}) — sending alert")
         send_alert(detail)
         sys.exit(1)
