@@ -1,5 +1,6 @@
 import os
 import sys
+import ssl
 import smtplib
 import urllib.request
 import urllib.error
@@ -14,12 +15,17 @@ SMTP_HOST = os.environ.get("SMTP_HOST", "smtp.gmail.com")
 SMTP_PORT = int(os.environ.get("SMTP_PORT", "587"))
 TIMEOUT = int(os.environ.get("TIMEOUT_SECONDS", "30"))
 
+# Skip SSL verification entirely — we only care if the site responds
+SSL_CTX = ssl.create_default_context()
+SSL_CTX.check_hostname = False
+SSL_CTX.verify_mode = ssl.CERT_NONE
+
 
 def check_site():
     try:
         req = urllib.request.Request(SITE_URL, method="GET")
         req.add_header("User-Agent", "UptimeMonitor/1.0")
-        resp = urllib.request.urlopen(req, timeout=TIMEOUT)
+        resp = urllib.request.urlopen(req, timeout=TIMEOUT, context=SSL_CTX)
         status = resp.getcode()
         if status >= 400:
             return False, f"HTTP {status}"
